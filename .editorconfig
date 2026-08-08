@@ -1,0 +1,22 @@
+# EditorConfig: エディタで保存される作業ツリー上の形式を統一する。
+root = true
+
+# 手書きするテキストファイルの既定値。
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Visual Studio / MSBuild が生成・更新するファイルは、ツールの形式に合わせる。
+[*.{sln,vcxproj,vcxproj.filters,vcxproj.user,props,targets,natvis}]
+charset = utf-8-bom
+end_of_line = crlf
+
+# Windows コマンドスクリプトは CRLF にする。
+[*.{bat,cmd}]
+end_of_line = crlf
+
+# Markdown の行末空白は、意図的な改行として使われることがある。
+[*.md]
+trim_trailing_whitespace = false

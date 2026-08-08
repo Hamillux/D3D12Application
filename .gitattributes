@@ -1,0 +1,94 @@
+# Git 内部と作業ツリーの改行を、利用者の core.autocrlf に依存せず統一する。
+# バイナリと判定されたファイルは変換しない。
+* text=auto eol=lf
+
+# C / C++
+*.c     text eol=lf
+*.cc    text eol=lf
+*.cpp   text eol=lf
+*.cxx   text eol=lf
+*.h     text eol=lf
+*.hh    text eol=lf
+*.hpp   text eol=lf
+*.hxx   text eol=lf
+*.inl   text eol=lf
+*.ipp   text eol=lf
+*.ixx   text eol=lf
+*.cppm  text eol=lf
+
+# HLSL
+*.hlsl  text eol=lf
+*.hlsli text eol=lf
+*.fx    text eol=lf
+*.fxh   text eol=lf
+
+# 一般的なテキスト／設定ファイル
+*.md          text eol=lf
+*.txt         text eol=lf
+*.json        text eol=lf
+*.jsonc       text eol=lf
+*.yml         text eol=lf
+*.yaml        text eol=lf
+*.xml         text eol=lf
+*.toml        text eol=lf
+*.ini         text eol=lf
+*.cmake       text eol=lf
+CMakeLists.txt text eol=lf
+.editorconfig text eol=lf
+.gitattributes text eol=lf
+.gitignore    text eol=lf
+
+# Visual Studio / MSBuild
+*.sln             text eol=crlf
+*.vcxproj         text eol=crlf
+*.vcxproj.filters text eol=crlf
+*.vcxproj.user    text eol=crlf
+*.props           text eol=crlf
+*.targets         text eol=crlf
+*.natvis          text eol=crlf
+
+# スクリプト
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.sh  text eol=lf
+
+# 画像／DirectX アセット
+*.bmp  binary
+*.cur  binary
+*.dds  binary
+*.gif  binary
+*.ico  binary
+*.jpeg binary
+*.jpg  binary
+*.png  binary
+*.tga  binary
+*.tif  binary
+*.tiff binary
+*.webp binary
+*.cso  binary
+*.glb  binary
+*.fbx  binary
+
+# 音声／動画
+*.avi  binary
+*.flac binary
+*.m4a  binary
+*.mkv  binary
+*.mp3  binary
+*.mp4  binary
+*.ogg  binary
+*.wav  binary
+*.webm binary
+
+# ビルド成果物／アーカイブ
+*.dll binary
+*.exe binary
+*.lib binary
+*.pdb binary
+*.so  binary
+*.a   binary
+*.7z  binary
+*.gz  binary
+*.rar binary
+*.tar binary
+*.zip binary
