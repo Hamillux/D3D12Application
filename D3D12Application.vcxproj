@@ -153,10 +153,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\Application.cpp" />
+    <ClCompile Include="source\Engine\SampleEngine.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Engine\Engine.cpp" />
+    <ClCompile Include="source\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\app.h" />
+    <ClInclude Include="source\Application.h" />
+    <ClInclude Include="source\d3dx12.h" />
+    <ClInclude Include="source\Engine\Engine.h" />
+    <ClInclude Include="source\Engine\EnginesInclude.h" />
+    <ClInclude Include="source\Engine\SampleEngine.h" />
+    <ClInclude Include="source\Utility\Math.h" />
+    <ClInclude Include="source\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
