@@ -61,6 +61,8 @@ protected:
     }
 
 private:
+    bool _initialized = false;
+
     void ExecuteRender();
 
     void CreateCommandLists();

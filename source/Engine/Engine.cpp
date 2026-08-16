@@ -90,15 +90,23 @@ void Engine::Initialize(HWND window, uint32_t width, uint32_t height)
 
 	CreateCommandLists();
 	CreateFence();
+
+	_initialized = true;
 }
 
 void Engine::Finalize()
 {
+	if (!_initialized)
+	{
+		return;
+	}
+
 	const uint64_t fenceValue = _nextFenceValue;
 	SignalAndIncFenceValue();
 	WaitForFence(fenceValue);
 
 	CloseHandle(_fenceEvent);
+	_fenceEvent = nullptr;
 }
 
 void Engine::Tick(float deltaTime)
