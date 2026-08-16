@@ -4,7 +4,7 @@
 #include <chrono>
 #include <cstdint>
 #include "Engine/EnginesInclude.h"
-
+#include "InputSystem.h"
 namespace
 {
     constexpr std::uint32_t InitialWidth = 1280;
@@ -14,7 +14,7 @@ namespace
     constexpr double MaxDeltaTime = 0.1;
 }
 
-Application::Application(HINSTANCE instance, int showCommand) noexcept
+Application::Application(HINSTANCE instance, int showCommand)
     : _instance(instance)
     , _showCommand(showCommand)
     , _engine(std::make_unique<UseEngine>())
@@ -27,17 +27,11 @@ Application::~Application()
 
 int Application::Run()
 {
-    _window.Initialize(
-        _instance,
-        _showCommand,
-        InitialWidth,
-        InitialHeight,
-        WindowTitle);
-
-    _engine->Initialize(
-        _window.GetHandle(),
-        _window.GetClientWidth(),
-        _window.GetClientHeight());
+    if (!Startup())
+    {
+        Shutdown();
+        return 1;
+    }
 
     using Clock = std::chrono::steady_clock;
 
@@ -68,15 +62,55 @@ int Application::Run()
             std::chrono::duration<double>(
                 currentTime - previousTime
             ).count();
-
         previousTime = currentTime;
-
         deltaTime = std::min(deltaTime, MaxDeltaTime);
 
+        InputSystem::GetInstance().Update();
         _engine->Tick(deltaTime);
     }
 
-    _engine->Finalize();
+    Shutdown();
 
     return 0;
+}
+
+bool Application::Startup()
+{
+    try
+    {
+        if (FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED)))
+        {
+            return false;
+        }
+
+        if(!InputSystem::GetInstance().Initialize())
+        {
+            return false;
+        }
+
+        _window.Initialize(
+            _instance,
+            _showCommand,
+            InitialWidth,
+            InitialHeight,
+            WindowTitle);
+
+        _engine->Initialize(
+            _window.GetHandle(),
+            _window.GetClientWidth(),
+            _window.GetClientHeight());
+    }
+    catch (std::exception& e)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void Application::Shutdown()
+{
+    _engine->Finalize();
+    InputSystem::GetInstance().Shutdown();
+    CoUninitialize();
 }
