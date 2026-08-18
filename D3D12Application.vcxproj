@@ -157,6 +157,7 @@
     <ClCompile Include="source\Engine\SampleEngine.cpp" />
     <ClCompile Include="source\InputSystem.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Renderer.cpp" />
     <ClCompile Include="source\Engine\Engine.cpp" />
     <ClCompile Include="source\FileSystem.cpp" />
     <ClCompile Include="source\Window.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="source\Engine\EnginesInclude.h" />
     <ClInclude Include="source\Engine\SampleEngine.h" />
     <ClInclude Include="source\InputSystem.h" />
+    <ClInclude Include="source\Renderer.h" />
     <ClInclude Include="source\Singleton.h" />
     <ClInclude Include="source\FileSystem.h" />
     <ClInclude Include="source\Utility\Math.h" />
