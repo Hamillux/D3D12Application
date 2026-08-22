@@ -22,9 +22,13 @@ protected:
     template<typename T>
     using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-    virtual std::uint32_t GetFrameCount() const
+    virtual RendererConfig GetRendererConfig() const
     {
-        return 2;
+        RendererConfig cfg{};
+        cfg._rtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        cfg._dsvFormat = DXGI_FORMAT_D32_FLOAT;
+        cfg._frameCount = 2;
+        return cfg;
     }
 
     virtual void OnInitialize()

@@ -9,12 +9,13 @@ void Engine::Initialize(HWND window, std::uint32_t width, std::uint32_t height)
         throw std::logic_error("Engine is already initialized.");
     }
 
-    _renderer.Initialize(window, width, height, GetFrameCount());
-    _initialized = true;
-
     try
     {
+        const RendererConfig rdrCfg = GetRendererConfig();
+        _renderer.Initialize(window, width, height, rdrCfg);
         OnInitialize();
+
+        _initialized = true;
     }
     catch (...)
     {

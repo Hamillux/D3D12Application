@@ -27,13 +27,14 @@ void Renderer::Initialize(
     HWND window,
     std::uint32_t width,
     std::uint32_t height,
-    std::uint32_t frameCount)
+    const RendererConfig& config)
 {
     if (_initialized)
     {
         throw std::logic_error("Renderer is already initialized.");
     }
-    if (window == nullptr || width == 0 || height == 0 || frameCount < 2)
+    if (window == nullptr || width == 0 || height == 0 ||
+        config._frameCount < 2 || config._rtvFormat == DXGI_FORMAT_UNKNOWN || config._dsvFormat == DXGI_FORMAT_UNKNOWN)
     {
         throw std::invalid_argument("Invalid renderer initialization parameters.");
     }
@@ -76,7 +77,7 @@ void Renderer::Initialize(
     swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     swapChainDesc.SampleDesc.Count = 1;
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    swapChainDesc.BufferCount = frameCount;
+    swapChainDesc.BufferCount = config._frameCount;
     swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
@@ -93,7 +94,7 @@ void Renderer::Initialize(
     ThrowIfFailed(factory->MakeWindowAssociation(window, DXGI_MWA_NO_ALT_ENTER));
 
     _frameIndex = _swapChain->GetCurrentBackBufferIndex();
-    CreateFrameContexts(width, height, frameCount);
+    CreateFrameContexts(width, height, config);
 
     ThrowIfFailed(_device->CreateCommandAllocator(
         D3D12_COMMAND_LIST_TYPE_DIRECT,
@@ -315,8 +316,10 @@ void Renderer::CreateCommandLists()
 void Renderer::CreateFrameContexts(
     std::uint32_t width,
     std::uint32_t height,
-    std::uint32_t frameCount)
+    const RendererConfig& config)
 {
+    const uint32_t frameCount = config._frameCount;
+
     _frameContexts.clear();
     _frameContexts.resize(frameCount);
 
@@ -347,7 +350,7 @@ void Renderer::CreateFrameContexts(
             IID_PPV_ARGS(&frame.renderTarget)));
 
         D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-        rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        rtvDesc.Format = config._rtvFormat;
         rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
         _device->CreateRenderTargetView(frame.renderTarget.Get(), &rtvDesc, rtvHandle);
         frame.renderTargetView = rtvHandle;
@@ -370,7 +373,7 @@ void Renderer::CreateFrameContexts(
     {
         const CD3DX12_HEAP_PROPERTIES heapProperties(D3D12_HEAP_TYPE_DEFAULT);
         const D3D12_RESOURCE_DESC depthStencilDesc = CD3DX12_RESOURCE_DESC::Tex2D(
-            DXGI_FORMAT_D32_FLOAT,
+            config._dsvFormat,
             width,
             height,
             1,
@@ -380,7 +383,7 @@ void Renderer::CreateFrameContexts(
             D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 
         D3D12_CLEAR_VALUE clearValue{};
-        clearValue.Format = DXGI_FORMAT_D32_FLOAT;
+        clearValue.Format = config._dsvFormat;
         clearValue.DepthStencil.Depth = 1.0f;
 
         ThrowIfFailed(_device->CreateCommittedResource(
@@ -392,7 +395,7 @@ void Renderer::CreateFrameContexts(
             IID_PPV_ARGS(&frame.depthStencilBuffer)));
 
         D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-        dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+        dsvDesc.Format = config._dsvFormat;
         dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
         _device->CreateDepthStencilView(
             frame.depthStencilBuffer.Get(),

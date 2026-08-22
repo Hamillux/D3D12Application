@@ -8,6 +8,13 @@
 
 #include <vector>
 
+struct RendererConfig
+{
+    DXGI_FORMAT _rtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    DXGI_FORMAT _dsvFormat = DXGI_FORMAT_D32_FLOAT;
+    uint32_t _frameCount = 2;
+};
+
 struct RenderContext
 {
     ID3D12GraphicsCommandList* command = nullptr;
@@ -32,7 +39,7 @@ public:
         HWND window,
         std::uint32_t width,
         std::uint32_t height,
-        std::uint32_t frameCount);
+        const RendererConfig& config);
     void WaitForIdle();
     void Finalize();
 
@@ -68,7 +75,7 @@ private:
     void CreateFrameContexts(
         std::uint32_t width,
         std::uint32_t height,
-        std::uint32_t frameCount);
+        const RendererConfig& config);
     void CreateFence();
     void WaitForFence(std::uint64_t fenceValue);
     void SignalFence();
