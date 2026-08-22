@@ -191,6 +191,28 @@ LRESULT Window::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
         return 1;
 
     default:
-        return DefWindowProcW(_handle, message, wParam, lParam);
+    {
+        std::optional<LRESULT> result = std::nullopt;
+
+        _iteratingMessageHandlers = true;
+        for (const auto& msgHandler : _messageHandlers)
+        {
+            result = msgHandler.HandleMessage(_handle, message, wParam, lParam);
+            if (result.has_value())
+            {
+                break;
+            }
+        }
+        _iteratingMessageHandlers = false;
+
+        if (result.has_value())
+        {
+            return result.value();
+        }
+        else
+        {
+            return DefWindowProcW(_handle, message, wParam, lParam);
+        }
+    }
     }
 }
