@@ -6,3 +6,4 @@ D3D12Application/
 # NuGet packages
 packages/
 *.nupkg
+imgui.ini
