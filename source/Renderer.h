@@ -55,6 +55,12 @@ public:
         return _device.Get();
     }
 
+    const DXGI_QUERY_VIDEO_MEMORY_INFO& UpdateMemoryInfo();
+    const DXGI_QUERY_VIDEO_MEMORY_INFO& GetMemoryInfo() const
+    {
+        return _memoryInfo;
+    }
+
 private:
     template<typename T>
     using ComPtr = Microsoft::WRL::ComPtr<T>;
@@ -84,6 +90,8 @@ private:
     bool _frameActive = false;
     bool _recordingUploadCommands = false;
 
+    ComPtr<IDXGIFactory4> _factory;
+    ComPtr<IDXGIAdapter4> _adapter;
     ComPtr<ID3D12Device> _device;
     ComPtr<IDXGISwapChain3> _swapChain;
     ComPtr<ID3D12CommandQueue> _commandQueue;
@@ -103,4 +111,6 @@ private:
 
     D3D12_RECT _scissorRect{};
     D3D12_VIEWPORT _viewport{};
+
+    DXGI_QUERY_VIDEO_MEMORY_INFO _memoryInfo{};
 };

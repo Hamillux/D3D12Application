@@ -56,12 +56,16 @@ void Renderer::Initialize(
     }
 #endif
 
-    ComPtr<IDXGIFactory2> factory;
-    ThrowIfFailed(CreateDXGIFactory2(factoryFlags, IID_PPV_ARGS(&factory)));
+    ThrowIfFailed(CreateDXGIFactory2(factoryFlags, IID_PPV_ARGS(&_factory)));
     ThrowIfFailed(D3D12CreateDevice(
         nullptr,
         D3D_FEATURE_LEVEL_12_2,
         IID_PPV_ARGS(&_device)));
+
+    const LUID luid = _device->GetAdapterLuid();
+    ThrowIfFailed(
+        _factory->EnumAdapterByLuid(luid, IID_PPV_ARGS(&_adapter))
+    );
 
     D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
     commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
@@ -83,7 +87,7 @@ void Renderer::Initialize(
     swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 
     ComPtr<IDXGISwapChain1> swapChain;
-    ThrowIfFailed(factory->CreateSwapChainForHwnd(
+    ThrowIfFailed(_factory->CreateSwapChainForHwnd(
         _commandQueue.Get(),
         window,
         &swapChainDesc,
@@ -91,7 +95,7 @@ void Renderer::Initialize(
         nullptr,
         &swapChain));
     ThrowIfFailed(swapChain.As(&_swapChain));
-    ThrowIfFailed(factory->MakeWindowAssociation(window, DXGI_MWA_NO_ALT_ENTER));
+    ThrowIfFailed(_factory->MakeWindowAssociation(window, DXGI_MWA_NO_ALT_ENTER));
 
     _frameIndex = _swapChain->GetCurrentBackBufferIndex();
     CreateFrameContexts(width, height, config);
@@ -131,6 +135,9 @@ void Renderer::Finalize()
     _swapChain.Reset();
     _commandQueue.Reset();
     _device.Reset();
+    _adapter.Reset();
+    _factory.Reset();
+    _memoryInfo = DXGI_QUERY_VIDEO_MEMORY_INFO{};
 
     _renderContext = {};
     _nextFenceValue = 1;
@@ -284,6 +291,20 @@ std::uint64_t Renderer::ExecuteUploadCommands()
     SignalFence();
     WaitForFence(fenceValue);
     return fenceValue;
+}
+
+const DXGI_QUERY_VIDEO_MEMORY_INFO& Renderer::UpdateMemoryInfo()
+{
+    if (!_adapter)
+    {
+        throw std::logic_error("adapter is null");
+    }
+
+    ThrowIfFailed(
+        _adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &_memoryInfo)
+    );
+
+    return _memoryInfo;
 }
 
 void Renderer::ThrowIfFailed(HRESULT result)
