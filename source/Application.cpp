@@ -99,6 +99,9 @@ bool Application::Startup()
             _window.GetHandle(),
             _window.GetClientWidth(),
             _window.GetClientHeight());
+
+        _engineMsgHandlerId = _window.RegisterHandler<Engine, &Engine::HandleWindowMessage>(_engine.get());
+
     }
     catch (...)
     {
@@ -110,6 +113,10 @@ bool Application::Startup()
 
 void Application::Shutdown()
 {
+    if(_engineMsgHandlerId != Window::NULL_MESSAGE_HANDLER_ID)
+    {
+        _window.UnregisterMessageHandler(_engineMsgHandlerId);
+    }
     _engine->Finalize();
     InputSystem::GetInstance().Shutdown();
     CoUninitialize();

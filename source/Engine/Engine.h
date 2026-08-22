@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderer.h"
+#include "ImGuiLayer.h"
 
 #include <cstdint>
 #include <wrl/client.h>
@@ -17,6 +18,11 @@ public:
     void Initialize(HWND window, std::uint32_t width, std::uint32_t height);
     void Finalize();
     void Tick(float deltaTime);
+
+    std::optional<LRESULT> HandleWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    {
+        return _imguiLayer.HandleWindowMessage(hwnd, msg, wParam, lParam);
+    }
 
 protected:
     template<typename T>
@@ -36,6 +42,8 @@ protected:
 
     virtual void Update(float)
     {}
+
+    virtual void BuildImGui();
 
     virtual void Render(RenderContext& context);
 
@@ -65,4 +73,5 @@ protected:
 private:
     bool _initialized = false;
     Renderer _renderer;
+    ImGuiLayer _imguiLayer;
 };

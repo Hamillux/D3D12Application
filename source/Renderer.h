@@ -55,6 +55,11 @@ public:
         return _device.Get();
     }
 
+    ID3D12CommandQueue* GetCommandQueue() const noexcept
+    {
+        return _commandQueue.Get();
+    }
+
     const DXGI_QUERY_VIDEO_MEMORY_INFO& UpdateMemoryInfo();
     const DXGI_QUERY_VIDEO_MEMORY_INFO& GetMemoryInfo() const
     {

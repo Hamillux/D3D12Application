@@ -26,4 +26,5 @@ private:
     int _showCommand = SW_SHOWNORMAL;
     Window _window;
     std::unique_ptr<class Engine> _engine;
+    Window::MessageHandlerId _engineMsgHandlerId = Window::NULL_MESSAGE_HANDLER_ID;
 };
