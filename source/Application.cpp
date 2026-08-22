@@ -66,7 +66,7 @@ int Application::Run()
         deltaTime = std::min(deltaTime, MaxDeltaTime);
 
         InputSystem::GetInstance().Update();
-        _engine->Tick(deltaTime);
+        _engine->Tick(static_cast<float>(deltaTime));
     }
 
     Shutdown();
@@ -100,7 +100,7 @@ bool Application::Startup()
             _window.GetClientWidth(),
             _window.GetClientHeight());
     }
-    catch (std::exception& e)
+    catch (...)
     {
         return false;
     }
