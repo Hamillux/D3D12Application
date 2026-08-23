@@ -55,19 +55,19 @@ protected:
         return _renderer.GetDevice();
     }
 
-    ID3D12GraphicsCommandList* BeginUploadCommands()
+    ID3D12GraphicsCommandList* BeginImmediateCommands()
     {
-        return _renderer.BeginUploadCommands();
+        return _renderer.BeginImmediateCommands();
     }
 
-    void EndUploadCommands()
+    void EndImmediateCommands()
     {
-        _renderer.EndUploadCommands();
+        _renderer.EndImmediateCommands();
     }
 
-    std::uint64_t ExecuteUploadCommands()
+    std::uint64_t ExecuteImmediateCommands()
     {
-        return _renderer.ExecuteUploadCommands();
+        return _renderer.ExecuteImmediateCommands();
     }
 
 private:

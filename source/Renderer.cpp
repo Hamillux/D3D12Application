@@ -102,7 +102,7 @@ void Renderer::Initialize(
 
     ThrowIfFailed(_device->CreateCommandAllocator(
         D3D12_COMMAND_LIST_TYPE_DIRECT,
-        IID_PPV_ARGS(&_uploadCommandAllocator)));
+        IID_PPV_ARGS(&_immediateCommandAllocator)));
 
     CreateCommandLists();
     CreateFence();
@@ -115,7 +115,7 @@ void Renderer::Finalize()
     {
         return;
     }
-    if (_frameActive || _recordingUploadCommands)
+    if (_frameActive || _recordingImmediateCommands)
     {
         throw std::logic_error("Cannot finalize the renderer while recording commands.");
     }
@@ -126,8 +126,8 @@ void Renderer::Finalize()
     _fenceEvent = nullptr;
 
     _frameContexts.clear();
-    _uploadCommandList.Reset();
-    _uploadCommandAllocator.Reset();
+    _immediateCommandList.Reset();
+    _immediateCommandAllocator.Reset();
     _commandList.Reset();
     _fence.Reset();
     _depthStencilViewHeap.Reset();
@@ -151,7 +151,7 @@ void Renderer::WaitForIdle()
     {
         return;
     }
-    if (_frameActive || _recordingUploadCommands)
+    if (_frameActive || _recordingImmediateCommands)
     {
         throw std::logic_error("Cannot wait for the renderer while recording commands.");
     }
@@ -245,46 +245,46 @@ void Renderer::EndFrame()
     ThrowIfFailed(presentResult);
 }
 
-ID3D12GraphicsCommandList* Renderer::BeginUploadCommands()
+ID3D12GraphicsCommandList* Renderer::BeginImmediateCommands()
 {
     if (!_initialized)
     {
         throw std::logic_error("Renderer is not initialized.");
     }
-    if (_recordingUploadCommands)
+    if (_recordingImmediateCommands)
     {
-        throw std::logic_error("Upload commands are already being recorded.");
+        throw std::logic_error("Immediate commands are already being recorded.");
     }
 
-    ThrowIfFailed(_uploadCommandAllocator->Reset());
-    ThrowIfFailed(_uploadCommandList->Reset(_uploadCommandAllocator.Get(), nullptr));
-    _recordingUploadCommands = true;
-    return _uploadCommandList.Get();
+    ThrowIfFailed(_immediateCommandAllocator->Reset());
+    ThrowIfFailed(_immediateCommandList->Reset(_immediateCommandAllocator.Get(), nullptr));
+    _recordingImmediateCommands = true;
+    return _immediateCommandList.Get();
 }
 
-void Renderer::EndUploadCommands()
+void Renderer::EndImmediateCommands()
 {
-    if (!_recordingUploadCommands)
+    if (!_recordingImmediateCommands)
     {
-        throw std::logic_error("No upload commands are being recorded.");
+        throw std::logic_error("No immediate commands are being recorded.");
     }
 
-    ThrowIfFailed(_uploadCommandList->Close());
-    _recordingUploadCommands = false;
+    ThrowIfFailed(_immediateCommandList->Close());
+    _recordingImmediateCommands = false;
 }
 
-std::uint64_t Renderer::ExecuteUploadCommands()
+std::uint64_t Renderer::ExecuteImmediateCommands()
 {
     if (!_initialized)
     {
         throw std::logic_error("Renderer is not initialized.");
     }
-    if (_recordingUploadCommands)
+    if (_recordingImmediateCommands)
     {
-        throw std::logic_error("Upload commands must be ended before execution.");
+        throw std::logic_error("Immediate commands must be ended before execution.");
     }
 
-    ID3D12CommandList* commandLists[] = { _uploadCommandList.Get() };
+    ID3D12CommandList* commandLists[] = { _immediateCommandList.Get() };
     _commandQueue->ExecuteCommandLists(1, commandLists);
 
     const std::uint64_t fenceValue = _nextFenceValue;
@@ -328,10 +328,10 @@ void Renderer::CreateCommandLists()
     ThrowIfFailed(_device->CreateCommandList(
         0,
         D3D12_COMMAND_LIST_TYPE_DIRECT,
-        _uploadCommandAllocator.Get(),
+        _immediateCommandAllocator.Get(),
         nullptr,
-        IID_PPV_ARGS(&_uploadCommandList)));
-    ThrowIfFailed(_uploadCommandList->Close());
+        IID_PPV_ARGS(&_immediateCommandList)));
+    ThrowIfFailed(_immediateCommandList->Close());
 }
 
 void Renderer::CreateFrameContexts(

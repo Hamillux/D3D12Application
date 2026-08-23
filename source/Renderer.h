@@ -46,9 +46,9 @@ public:
     RenderContext& BeginFrame();
     void EndFrame();
 
-    ID3D12GraphicsCommandList* BeginUploadCommands();
-    void EndUploadCommands();
-    std::uint64_t ExecuteUploadCommands();
+    ID3D12GraphicsCommandList* BeginImmediateCommands();
+    void EndImmediateCommands();
+    std::uint64_t ExecuteImmediateCommands();
 
     ID3D12Device* GetDevice() const noexcept
     {
@@ -93,7 +93,7 @@ private:
 
     bool _initialized = false;
     bool _frameActive = false;
-    bool _recordingUploadCommands = false;
+    bool _recordingImmediateCommands = false;
 
     ComPtr<IDXGIFactory4> _factory;
     ComPtr<IDXGIAdapter4> _adapter;
@@ -104,8 +104,8 @@ private:
     ComPtr<ID3D12DescriptorHeap> _depthStencilViewHeap;
     ComPtr<ID3D12Fence> _fence;
     ComPtr<ID3D12GraphicsCommandList> _commandList;
-    ComPtr<ID3D12CommandAllocator> _uploadCommandAllocator;
-    ComPtr<ID3D12GraphicsCommandList> _uploadCommandList;
+    ComPtr<ID3D12CommandAllocator> _immediateCommandAllocator;
+    ComPtr<ID3D12GraphicsCommandList> _immediateCommandList;
 
     std::vector<FrameContext> _frameContexts;
     RenderContext _renderContext{};
